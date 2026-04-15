@@ -1,0 +1,23 @@
+[project]
+name = "apply-pilot"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "beautifulsoup4>=4.14.3",
+    "langchain>=1.2.15",
+    "langchain-community>=0.4.1",
+    "langchain-mcp-adapters>=0.2.2",
+    "langchain-ollama>=1.1.0",
+    "langchain-openai>=1.1.12",
+    "lxml>=6.0.3",
+    "mcp-use>=1.7.0",
+    "playwright>=1.58.0",
+    "python-dotenv>=1.2.2",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.2.0",
+]
