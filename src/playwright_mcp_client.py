@@ -1,6 +1,7 @@
-from langchain_mcp_adapters.client import MultiServerMCPClient  
-    
-class PlaywrightMCPClient():
+from langchain_mcp_adapters.client import MultiServerMCPClient
+
+
+class PlaywrightMCPClient:
     def __init__(self):
         self._headless_client = None
         self._headful_client = None
@@ -14,25 +15,27 @@ class PlaywrightMCPClient():
         if self._headful_client is None:
             self._headful_client = await self._get_client("headful")
         return self._headful_client
-    
+
     async def _get_client(self, mode):
         if mode == "headless":
             args = ["@playwright/mcp@latest", "--extension", "--headless"]
         elif mode == "headful":
             args = ["@playwright/mcp@latest", "--extension"]
-            
-        client = MultiServerMCPClient({
-        "playwright": {
-            "command": "npx",
-            "args": args,
-            "transport": "stdio",
-            "env": {
-                "PLAYWRIGHT_MCP_EXTENSION_TOKEN":"L-GDSJHJCPuarXeH8l1TB3LMnQBb7MSE9swh9REp3nU",
-                "PLAYWRIGHT_MCP_OUTPUT_DIR": "src/assets/playwright_mcp_output",
+
+        client = MultiServerMCPClient(
+            {
+                "playwright": {
+                    "command": "npx",
+                    "args": args,
+                    "transport": "stdio",
+                    "env": {
+                        "PLAYWRIGHT_MCP_EXTENSION_TOKEN": "L-GDSJHJCPuarXeH8l1TB3LMnQBb7MSE9swh9REp3nU",
+                        "PLAYWRIGHT_MCP_OUTPUT_DIR": "src/assets/playwright_mcp_output",
+                    },
+                }
             }
-            }
-        })
-        
+        )
+
         return client
 
     async def get_client(self, mode):
@@ -42,7 +45,7 @@ class PlaywrightMCPClient():
             return await self.headful_client()
         else:
             raise ValueError("Invalid mode. Use 'headless' or 'headful'.")
-        
+
     async def get_tools(self, mode):
         client = await self.get_client(mode)
         tools = await client.get_tools()

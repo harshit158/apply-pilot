@@ -2,6 +2,7 @@ from langchain_ollama import ChatOllama
 from langchain_openai import ChatOpenAI
 
 from dotenv import load_dotenv
+
 load_dotenv(dotenv_path="/Users/harshit/Documents/Projects/foundry/.env", override=True)
 
 llm_ollama = ChatOllama(
