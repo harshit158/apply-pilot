@@ -9,9 +9,7 @@ async def click_on_apply_button(state: AgentState):
         print("Apply button not found, skipping this step.\n\n")
         return {}
 
-    response = await state["tool_name_to_tool_mapping"]["browser_click"].ainvoke(
-        {"ref": state["is_apply_button_present"].ref}
-    )
+    response = await state["tool_name_to_tool_mapping"]["browser_click"].ainvoke({"ref": state["is_apply_button_present"].ref})
     text = response[0]["text"]
     snapshot_path, page_tree = extract_page_tree(text)
 

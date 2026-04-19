@@ -1,4 +1,5 @@
-from langgraph.graph import StateGraph, START, END
+from langgraph.graph import END, START, StateGraph
+
 from src.agents.field_agent.models import AgentState, InputField
 
 # import nodes
@@ -41,7 +42,5 @@ class FieldAgent:
         self.graph = await self._build_graph()
 
         # stream results
-        async for chunk in self.graph.astream(
-            {"input_field": self.input_field}, stream_mode="values"
-        ):
+        async for chunk in self.graph.astream({"input_field": self.input_field}, stream_mode="values"):
             print("Chunk from FieldAgent:", chunk)

@@ -1,17 +1,17 @@
-from langgraph.graph import StateGraph, START, END
 from langchain_mcp_adapters.tools import load_mcp_tools
-
-from src.playwright_mcp_client import PlaywrightMCPClient
+from langgraph.graph import END, START, StateGraph
 
 from src.agents.job_agent.models import AgentState
-
-# import nodes
 from src.agents.job_agent.nodes.check_for_apply_button import check_for_apply_button
-from src.agents.job_agent.nodes.navigate_to_url import navigate_to_url
 from src.agents.job_agent.nodes.click_on_apply_button import click_on_apply_button
 from src.agents.job_agent.nodes.extract_fields import extract_fields
 from src.agents.job_agent.nodes.fill_fields import fill_fields
+from src.agents.job_agent.nodes.navigate_to_url import navigate_to_url
+from src.playwright_mcp_client import PlaywrightMCPClient
 
+from src.observability.observe_langfuse import get_langfuse_handler
+
+langfuse_handler = get_langfuse_handler()
 
 class JobAgent:
     def __init__(self, mcp_client: PlaywrightMCPClient, llm, url: str):
@@ -33,7 +33,7 @@ class JobAgent:
         # Build the Graph
         workflow = StateGraph(AgentState)
 
-        # Add our two primary nodes
+        # Define workflow nodes
         workflow.add_node("init", self._node_init)
         workflow.add_node("navigate_to_url", navigate_to_url)
         workflow.add_node("check_for_apply_button", check_for_apply_button)
@@ -41,7 +41,7 @@ class JobAgent:
         workflow.add_node("extract_fields", extract_fields)
         workflow.add_node("fill_fields", fill_fields)
 
-        # Set entry point
+        # Define workflow edges
         workflow.add_edge(START, "init")
         workflow.add_edge("init", "navigate_to_url")
         workflow.add_edge("navigate_to_url", "check_for_apply_button")
@@ -50,7 +50,7 @@ class JobAgent:
         workflow.add_edge("extract_fields", "fill_fields")
         workflow.add_edge("fill_fields", END)
 
-        # Compile and Run
+        # Compile
         graph = workflow.compile()
 
         return graph
@@ -71,9 +71,7 @@ class JobAgent:
         async with self.client.session("playwright") as session:
             # playwright_tools = await client.get_tools()
             self.playwright_tools = await load_mcp_tools(session)
-            self.tool_name_to_tool_mapping = {
-                tool.name: tool for tool in self.playwright_tools
-            }
+            self.tool_name_to_tool_mapping = {tool.name: tool for tool in self.playwright_tools}
 
             # 2. Set up the LLM and bind tools
             # The model needs to know which tools it is allowed to "call"
@@ -84,6 +82,6 @@ class JobAgent:
             # Test the agent
             # inputs = {"messages": [("user", f"Go to {self.url} and apply for the job using ref id: f1e100")]}
             inputs = {"url": self.url}
-            async for chunk in self.graph.astream(inputs, stream_mode="values"):
+            async for chunk in self.graph.astream(inputs, stream_mode="values", config={"callbacks": [langfuse_handler]}):
                 if len(chunk["messages"]) > 0:
                     chunk["messages"][-1].pretty_print()

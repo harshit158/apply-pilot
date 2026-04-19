@@ -1,6 +1,7 @@
 import asyncio
-from src.agents.job_agent.models import AgentState
+
 from src.agents.field_agent.agent import FieldAgent
+from src.agents.job_agent.models import AgentState
 
 
 async def fill_fields(state: AgentState):
@@ -9,9 +10,7 @@ async def fill_fields(state: AgentState):
     fields = state["input_fields"]  # assuming this exists
 
     # Create coroutines (DO NOT await yet)
-    tasks = [FieldAgent(field, 
-                        state["playwright_tools"], 
-                        state["tool_name_to_tool_mapping"]).invoke() for field in fields]
+    tasks = [FieldAgent(field, state["playwright_tools"], state["tool_name_to_tool_mapping"]).invoke() for field in fields]
 
     # Run all tasks concurrently
     results = await asyncio.gather(*tasks, return_exceptions=True)

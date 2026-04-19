@@ -11,9 +11,11 @@ dependencies = [
     "langchain-mcp-adapters>=0.2.2",
     "langchain-ollama>=1.1.0",
     "langchain-openai>=1.1.12",
+    "langfuse>=4.3.1",
     "lxml>=6.0.3",
     "mcp-use>=1.7.0",
     "playwright>=1.58.0",
+    "pydantic-settings>=2.13.1",
     "python-dotenv>=1.2.2",
 ]
 
@@ -22,3 +24,10 @@ dev = [
     "ipykernel>=7.2.0",
     "ruff>=0.4.0",
 ]
+
+[tool.ruff]
+line-length = 150
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E501"]

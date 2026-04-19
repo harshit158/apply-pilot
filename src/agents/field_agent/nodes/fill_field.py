@@ -1,8 +1,10 @@
 import json
-from src.agents.field_agent.models import AgentState
-from src.agents.commons.models import InputType
-from src.llm_providers import llm_ollama
+
 from langchain.agents import create_agent
+
+from src.agents.commons.models import InputType
+from src.agents.field_agent.models import AgentState
+from src.llm_providers import llm_ollama
 
 
 async def fill_field(state: AgentState):
@@ -31,7 +33,7 @@ async def fill_field(state: AgentState):
             "messages": [
                 {
                     "role": "user",
-                    "content": r"""You are given field details in the form of text, ref and type. Your task is to analyze the current webpage data and figure out how to fill this field using the Playwright tools. 
+                    "content": r"""You are given field details in the form of text, ref and type. Your task is to analyze the current webpage data and figure out how to fill this field using the Playwright tools.
                         Here is the field data: """
                     + field_data,
                 }

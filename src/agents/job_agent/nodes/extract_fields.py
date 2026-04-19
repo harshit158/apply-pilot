@@ -11,7 +11,7 @@ async def extract_fields(state: AgentState):
         [
             {
                 "role": "system",
-                "content": """You are an intelligent agent that can analyze job application webpage data to identify the input fields that need to be filled for a successful application. 
+                "content": """You are an intelligent agent that can analyze job application webpage data to identify the input fields that need to be filled for a successful application.
         ## Instructions:
         - Identify the input fields - their text, ref values, type and reason on why do you think they are the correct values.
         - Also identify fields that need to be uploaded with a file and their corresponding ref values and give reason on why do you think they are the correct values.""",

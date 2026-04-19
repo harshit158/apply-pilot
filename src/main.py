@@ -1,7 +1,8 @@
-from src.playwright_mcp_client import PlaywrightMCPClient
-from src.llm_providers import llm_ollama
-from src.agents.job_agent.agent import JobAgent
 import asyncio
+
+from src.agents.job_agent.agent import JobAgent
+from src.llm_providers import llm_ollama
+from src.playwright_mcp_client import PlaywrightMCPClient
 
 
 async def main(url: str):

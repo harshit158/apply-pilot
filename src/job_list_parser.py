@@ -1,9 +1,11 @@
 import json
 from pathlib import Path
-from pydantic import BaseModel, Field
+
 from playwright.async_api import async_playwright
+from pydantic import BaseModel, Field
+
 from src.playwright_mcp_client import PlaywrightMCPClient
-from src.utils import read_yml_file, extract_yml_path
+from src.utils import extract_yml_path, read_yml_file
 
 
 class JobsList(BaseModel):
@@ -61,9 +63,7 @@ class JobListParser:
         return len(text) > 10 and any(k in text for k in keywords)
 
     async def _get_companies_list(self, url: str) -> list[str]:
-        tool_name_to_tool = await self.mcp_client.get_tool_name_to_tool_mapping(
-            mode="headless"
-        )
+        tool_name_to_tool = await self.mcp_client.get_tool_name_to_tool_mapping(mode="headless")
         response = await tool_name_to_tool["browser_navigate"].ainvoke({"url": url})
 
         response_text = response[0]["text"]
@@ -83,19 +83,12 @@ class JobListParser:
         job_titles = self.extract_job_titles(yml_data)
 
         return job_titles
-        # print("Invoking LLM to extract job titles from the YML data...")
-        # llm_structured = self.llm.with_structured_output(JobsList)
-        # llm_response = await llm_structured.ainvoke(f"You are given the accessibility tree of a LinkedIn jobs search page. Extract the list of job titles from the page for using in the Playwright automation: {yml_data}")
-
-        # return llm_response.job_titles
 
     async def parse(self, url: str) -> dict:
         async with async_playwright() as p:
             browser = await p.chromium.launch(headless=False)
 
-            context = await browser.new_context(
-                storage_state=self.linkedin_session_storage_path
-            )
+            context = await browser.new_context(storage_state=self.linkedin_session_storage_path)
             page = await context.new_page()
 
             await page.goto(url)
@@ -109,12 +102,8 @@ class JobListParser:
                 print(f"Processing company: {company}")
 
                 # click job in left panel
-                company = company.replace(
-                    "(Verified job)", ""
-                ).strip()  # Clean up job title if it contains quotes
-                await page.get_by_role(
-                    "button", name=company, exact=False
-                ).first.click()
+                company = company.replace("(Verified job)", "").strip()  # Clean up job title if it contains quotes
+                await page.get_by_role("button", name=company, exact=False).first.click()
 
                 # wait for right panel to load (VERY IMPORTANT)
                 await page.wait_for_timeout(2000)
@@ -122,18 +111,14 @@ class JobListParser:
                 try:
                     # 3️⃣ click Apply button in main panel (with robust waits + fallback)
                     async with page.expect_popup(timeout=5000) as popup_info:
-                        await page.get_by_role(
-                            "link", name="Apply on company website"
-                        ).click(timeout=2000)
+                        await page.get_by_role("link", name="Apply on company website").click(timeout=2000)
 
                     new_tab = await popup_info.value
 
                     await new_tab.wait_for_load_state()
 
                     # Full page screenshot
-                    await new_tab.screenshot(
-                        path=f"src/assets/screenshots/new_tab_{i}.png", full_page=True
-                    )
+                    await new_tab.screenshot(path=f"src/assets/screenshots/new_tab_{i}.png", full_page=True)
 
                     print("New tab URL:", new_tab.url)
 
